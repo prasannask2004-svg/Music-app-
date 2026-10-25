@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "AuraGlass Sync — Collaborative Music & Video",
-  "short_name": "AuraGlass",
+  "name": "Aura Beats — Collaborative Music & Video",
+  "short_name": "Aura Beats",
   "description": "Collaborative real-time music and video player connecting Spotify and Apple Music with neon glass UI.",
   "start_url": "/",
   "scope": "/",

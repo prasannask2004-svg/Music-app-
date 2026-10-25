@@ -52,7 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => setActiveTab('stage')} 
               className="text-lg font-bold tracking-tight text-white hover:text-cyan-300 transition-colors whitespace-nowrap cursor-pointer text-left"
             >
-              AuraGlass Sync
+              Aura Beats
             </button>
             <span className="text-[10px] font-mono text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-1.5 py-0.5 rounded-md hidden sm:inline-block">
               v2.1

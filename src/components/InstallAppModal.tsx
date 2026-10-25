@@ -72,7 +72,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
               Download & Install on Android
             </h2>
             <p className="text-xs text-slate-400">
-              Two quick ways to install AuraGlass Sync as an Android app (.APK or PWA)
+              Two quick ways to install Aura Beats as an Android app (.APK or PWA)
             </p>
           </div>
         </div>
@@ -93,7 +93,7 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
               </span>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed mb-4">
-              Installs AuraGlass directly into your Android app drawer with full standalone screen and media notifications.
+              Installs Aura Beats directly into your Android app drawer with full standalone screen and media notifications.
             </p>
 
             <button

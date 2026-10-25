@@ -171,7 +171,7 @@ function MainAppContent() {
                     Spotify & Apple Music Gateway
                   </h3>
                   <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                    AuraGlass unifies metadata, audio playback, and official music videos from both platforms into a frictionless synchronized listening room.
+                    Aura Beats unifies metadata, audio playback, and official music videos from both platforms into a frictionless synchronized listening room.
                   </p>
                 </div>
 
