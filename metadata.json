@@ -1,0 +1,8 @@
+{
+  "name": "AuraGlass Sync — Collaborative Music & Video Player",
+  "description": "Connect Spotify and Apple Music catalogs with real-time collaborative listening lounges, synchronized audio and video playback, live reactions, and a sleek neon glass UI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
