@@ -1,17 +1,19 @@
 import React from 'react';
 import { useAudioPlayer } from '../context/AudioPlayerContext';
-import { Radio, Music2, Video, Users2, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { Radio, Music2, Video, Users2, Sparkles, SlidersHorizontal, Smartphone } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: 'stage' | 'catalog' | 'room' | 'connect';
   setActiveTab: (tab: 'stage' | 'catalog' | 'room' | 'connect') => void;
   onOpenConnectModal: () => void;
+  onOpenInstallModal: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
-  onOpenConnectModal
+  onOpenConnectModal,
+  onOpenInstallModal
 }) => {
   const {
     roomId,
@@ -25,6 +27,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const getThemeAccent = () => {
     switch (themeStyle) {
+      case 'gaana': return 'text-rose-400 border-rose-500/30';
+      case 'ytmusic': return 'text-red-400 border-red-500/30';
       case 'spotify': return 'text-emerald-400 border-emerald-500/30';
       case 'apple': return 'text-rose-400 border-rose-500/30';
       case 'aura':
@@ -43,12 +47,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Sparkles className="w-4 h-4 text-cyan-300" />
             </div>
           </div>
-          <button 
-            onClick={() => setActiveTab('stage')} 
-            className="text-lg font-bold tracking-tight text-white hover:text-cyan-300 transition-colors whitespace-nowrap cursor-pointer text-left"
-          >
-            AuraGlass Sync
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setActiveTab('stage')} 
+              className="text-lg font-bold tracking-tight text-white hover:text-cyan-300 transition-colors whitespace-nowrap cursor-pointer text-left"
+            >
+              AuraGlass Sync
+            </button>
+            <span className="text-[10px] font-mono text-cyan-300 bg-cyan-500/10 border border-cyan-500/30 px-1.5 py-0.5 rounded-md hidden sm:inline-block">
+              v2.1
+            </span>
+          </div>
         </div>
 
         {/* Zone 2: Navigation Links (Single-Line) */}
@@ -93,13 +102,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={onOpenConnectModal}
             className="whitespace-nowrap shrink-0 transition-colors text-slate-400 hover:text-slate-200 pb-0.5 border-b-2 border-transparent cursor-pointer flex items-center gap-1.5"
           >
-            <Radio className="w-4 h-4 text-emerald-400" />
-            <span>Connect Spotify & Apple</span>
+            <Radio className="w-4 h-4 text-rose-400" />
+            <span>Connect Apps & Servers</span>
+          </button>
+
+          <button
+            onClick={onOpenInstallModal}
+            className="whitespace-nowrap shrink-0 transition-colors text-cyan-400 hover:text-cyan-300 pb-0.5 border-b-2 border-transparent cursor-pointer flex items-center gap-1.5 font-medium"
+          >
+            <Smartphone className="w-4 h-4 text-cyan-400" />
+            <span>Install / APK</span>
           </button>
         </nav>
 
         {/* Zone 3: Primary Action & Lounge Status */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Mode Switch Button (Audio vs Video) */}
           <div className="hidden sm:flex items-center bg-white/[0.04] p-1 rounded-xl border border-white/10">
             <button

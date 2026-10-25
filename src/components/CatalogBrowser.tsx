@@ -20,16 +20,25 @@ export const CatalogBrowser: React.FC = () => {
   const filteredTracks = INITIAL_TRACKS.filter((t) => {
     const matchesSearch =
       t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (t.nativeTitle && t.nativeTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (t.tamilTitle && t.tamilTitle.toLowerCase().includes(searchQuery.toLowerCase())) ||
       t.artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.genre.toLowerCase().includes(searchQuery.toLowerCase());
+      (t.nativeArtist && t.nativeArtist.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      t.genre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.album.toLowerCase().includes(searchQuery.toLowerCase());
 
     if (!matchesSearch) return false;
     if (selectedCategory === 'all') return true;
+    if (selectedCategory === 'tamil') return t.language === 'tamil' || !!t.tamilTitle;
+    if (selectedCategory === 'hindi') return t.language === 'hindi';
+    if (selectedCategory === 'telugu') return t.language === 'telugu';
+    if (selectedCategory === 'malayalam') return t.language === 'malayalam';
+    if (selectedCategory === 'punjabi') return t.language === 'punjabi';
+    if (selectedCategory === 'english') return t.language === 'english';
+    if (selectedCategory === 'gaana') return t.platform === 'gaana';
+    if (selectedCategory === 'ytmusic') return t.platform === 'ytmusic';
     if (selectedCategory === 'spotify') return t.platform === 'spotify';
     if (selectedCategory === 'apple') return t.platform === 'apple';
-    if (selectedCategory === 'synthwave') return t.genre.toLowerCase().includes('synth');
-    if (selectedCategory === 'chill') return t.genre.toLowerCase().includes('chill') || t.genre.toLowerCase().includes('lo-fi');
-    if (selectedCategory === 'dance') return t.genre.toLowerCase().includes('disco') || t.genre.toLowerCase().includes('funk') || t.genre.toLowerCase().includes('electro');
     return true;
   });
 
@@ -155,18 +164,36 @@ export const CatalogBrowser: React.FC = () => {
                   </button>
 
                   {/* Platform Indicator */}
-                  <div className="absolute top-2.5 left-2.5">
+                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
                     <span
                       className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded-md backdrop-blur-md ${
-                        track.platform === 'spotify'
+                        track.platform === 'gaana'
+                          ? 'bg-rose-950/90 text-rose-300 border border-rose-500/40'
+                          : track.platform === 'ytmusic'
+                          ? 'bg-red-950/90 text-red-300 border border-red-500/40'
+                          : track.platform === 'spotify'
                           ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/30'
                           : track.platform === 'apple'
                           ? 'bg-rose-950/80 text-rose-300 border border-rose-500/30'
                           : 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/30'
                       }`}
                     >
-                      {track.platform === 'spotify' ? 'Spotify' : track.platform === 'apple' ? 'Apple Music' : 'Aura'}
+                      {track.platform === 'gaana'
+                        ? 'Gaana'
+                        : track.platform === 'ytmusic'
+                        ? 'YouTube Music'
+                        : track.platform === 'spotify'
+                        ? 'Spotify'
+                        : track.platform === 'apple'
+                        ? 'Apple Music'
+                        : 'Aura Master'}
                     </span>
+
+                    {track.releaseYear && (
+                      <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded-md bg-black/60 text-cyan-300 border border-white/10 backdrop-blur-md">
+                        {track.releaseYear}
+                      </span>
+                    )}
                   </div>
 
                   {/* Video Available Indicator */}
@@ -184,8 +211,13 @@ export const CatalogBrowser: React.FC = () => {
                 <h3 className="text-base font-bold text-white tracking-tight truncate">
                   {track.title}
                 </h3>
+                {(track.nativeTitle || track.tamilTitle) && (
+                  <p className="text-xs font-semibold text-cyan-300 truncate mt-0.5">
+                    {track.nativeTitle || track.tamilTitle}
+                  </p>
+                )}
                 <p className="text-xs text-slate-400 truncate mt-0.5">
-                  {track.artist}
+                  {track.nativeArtist || track.tamilArtist || track.artist}
                 </p>
 
                 {/* Metadata */}

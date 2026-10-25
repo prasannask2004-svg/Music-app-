@@ -7,6 +7,8 @@ import { CollaborativeRoom } from './components/CollaborativeRoom';
 import { CatalogBrowser } from './components/CatalogBrowser';
 import { PlayerBar } from './components/PlayerBar';
 import { ConnectPlatformsModal } from './components/ConnectPlatformsModal';
+import { InstallAppModal } from './components/InstallAppModal';
+import { AIAssistantDrawer } from './components/AIAssistantDrawer';
 import { Music2, Video, Users2, Sparkles, Radio, Disc3, ShieldCheck } from 'lucide-react';
 
 function MainAppContent() {
@@ -20,10 +22,15 @@ function MainAppContent() {
 
   const [activeTab, setActiveTab] = useState<'stage' | 'catalog' | 'room' | 'connect'>('stage');
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
 
   // Dynamic Theme Atmosphere
   const getThemeBackground = () => {
     switch (themeStyle) {
+      case 'gaana':
+        return 'from-[#1a0409] via-[#0d0306] to-[#060103]';
+      case 'ytmusic':
+        return 'from-[#1a0303] via-[#0d0202] to-[#060101]';
       case 'spotify':
         return 'from-[#04120b] via-[#060a0f] to-[#03060a]';
       case 'apple':
@@ -43,7 +50,11 @@ function MainAppContent() {
           className="absolute -top-40 left-1/4 w-[600px] h-[600px] rounded-full blur-[140px] opacity-25 transition-all duration-1000"
           style={{
             backgroundColor:
-              themeStyle === 'spotify'
+              themeStyle === 'gaana'
+                ? '#e11d48'
+                : themeStyle === 'ytmusic'
+                ? '#ff0000'
+                : themeStyle === 'spotify'
                 ? '#10b981'
                 : themeStyle === 'apple'
                 ? '#fb7185'
@@ -54,7 +65,11 @@ function MainAppContent() {
           className="absolute top-1/2 -right-40 w-[500px] h-[500px] rounded-full blur-[140px] opacity-20 transition-all duration-1000"
           style={{
             backgroundColor:
-              themeStyle === 'spotify'
+              themeStyle === 'gaana'
+                ? '#be123c'
+                : themeStyle === 'ytmusic'
+                ? '#dc2626'
+                : themeStyle === 'spotify'
                 ? '#059669'
                 : themeStyle === 'apple'
                 ? '#e11d48'
@@ -68,6 +83,7 @@ function MainAppContent() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenConnectModal={() => setIsConnectModalOpen(true)}
+        onOpenInstallModal={() => setIsInstallModalOpen(true)}
       />
 
       {/* Main Viewport Container */}
@@ -195,6 +211,15 @@ function MainAppContent() {
         isOpen={isConnectModalOpen}
         onClose={() => setIsConnectModalOpen(false)}
       />
+
+      {/* Android Install & APK Modal */}
+      <InstallAppModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+      />
+
+      {/* Gemini AI Music Assistant Floating Drawer */}
+      <AIAssistantDrawer />
 
     </div>
   );

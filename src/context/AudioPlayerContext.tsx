@@ -15,7 +15,7 @@ interface AudioPlayerContextType {
   equalizerPreset: EqualizerPreset;
   shuffle: boolean;
   repeat: boolean;
-  themeStyle: 'aura' | 'spotify' | 'apple';
+  themeStyle: 'aura' | 'spotify' | 'apple' | 'gaana' | 'ytmusic';
 
   // Room & collaboration state
   roomId: string;
@@ -41,7 +41,7 @@ interface AudioPlayerContextType {
   toggleShuffle: () => void;
   toggleRepeat: () => void;
   setEqualizerPreset: (preset: EqualizerPreset) => void;
-  setThemeStyle: (style: 'aura' | 'spotify' | 'apple') => void;
+  setThemeStyle: (style: 'aura' | 'spotify' | 'apple' | 'gaana' | 'ytmusic') => void;
 
   // Room actions
   joinRoom: (newRoomId: string) => void;
@@ -87,7 +87,7 @@ export const AudioPlayerProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [equalizerPreset, setEqualizerPresetState] = useState<EqualizerPreset>('electronic');
   const [shuffle, setShuffle] = useState<boolean>(false);
   const [repeat, setRepeat] = useState<boolean>(false);
-  const [themeStyle, setThemeStyle] = useState<'aura' | 'spotify' | 'apple'>('aura');
+  const [themeStyle, setThemeStyle] = useState<'aura' | 'spotify' | 'apple' | 'gaana' | 'ytmusic'>('aura');
 
   // Room state
   const [roomId, setRoomId] = useState<string>('LOUNGE-AURA');

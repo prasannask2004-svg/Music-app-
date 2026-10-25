@@ -1,17 +1,38 @@
 export type MediaMode = 'audio' | 'video';
 
-export type PlatformSource = 'spotify' | 'apple' | 'aura';
+export type PlatformSource = 'spotify' | 'apple' | 'gaana' | 'ytmusic' | 'aura';
+
+export type MusicLanguage =
+  | 'tamil'
+  | 'hindi'
+  | 'telugu'
+  | 'malayalam'
+  | 'punjabi'
+  | 'english'
+  | 'spanish'
+  | 'korean'
+  | 'multilingual';
 
 export interface LyricLine {
   time: number; // in seconds
   text: string;
+  textTamil?: string; // Tamil script (தமிழ்)
+  nativeScript?: string; // Hindi/Telugu/Malayalam/Punjabi native text
+  transliteration?: string; // Transliteration
+  meaning?: string; // English translation/meaning
 }
 
 export interface Track {
   id: string;
   title: string;
+  tamilTitle?: string;
+  nativeTitle?: string;
   artist: string;
+  tamilArtist?: string;
+  nativeArtist?: string;
   album: string;
+  tamilAlbum?: string;
+  releaseYear?: number;
   coverUrl: string;
   duration: number; // seconds
   audioUrl: string;
@@ -19,10 +40,20 @@ export interface Track {
   platform: PlatformSource;
   platformUrl?: string;
   genre: string;
+  language?: MusicLanguage;
   bpm?: number;
   lyrics?: LyricLine[];
   accentColor?: string; // hex or rgb
   upvotes?: number;
+}
+
+export interface AIAssistantMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  tamilContent?: string;
+  suggestedTrackId?: string;
+  timestamp: number;
 }
 
 export interface RoomParticipant {

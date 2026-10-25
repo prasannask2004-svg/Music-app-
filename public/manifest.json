@@ -1,0 +1,32 @@
+{
+  "id": "/",
+  "name": "AuraGlass Sync — Collaborative Music & Video",
+  "short_name": "AuraGlass",
+  "description": "Collaborative real-time music and video player connecting Spotify and Apple Music with neon glass UI.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#07090e",
+  "background_color": "#07090e",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

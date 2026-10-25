@@ -1,6 +1,6 @@
 {
   "name": "AuraGlass Sync — Collaborative Music & Video Player",
-  "description": "Connect Spotify and Apple Music catalogs with real-time collaborative listening lounges, synchronized audio and video playback, live reactions, and a sleek neon glass UI.",
+  "description": "Collaborative music and video player connecting Gaana, YouTube Music, Spotify & Apple Music with real-time listening rooms, 2026 multilingual releases (Tamil, Hindi, Telugu, Malayalam, Punjabi, English), synchronized Tamil lyrics, Gemini AI music assistant, and neon glass UI.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

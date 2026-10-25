@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useAudioPlayer } from '../context/AudioPlayerContext';
 import { VisualizerMode } from '../types';
-import { Disc3, Sparkles, BarChart2, CircleDot, Activity, Heart, Share2, Plus } from 'lucide-react';
+import { Disc3, Sparkles, BarChart2, CircleDot, Activity, Heart, Share2, Plus, Languages } from 'lucide-react';
 
 export const Visualizer: React.FC = () => {
   const {
@@ -14,6 +14,7 @@ export const Visualizer: React.FC = () => {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [visMode, setVisMode] = useState<VisualizerMode>('bars');
+  const [lyricLang, setLyricLang] = useState<'tamil' | 'english' | 'both'>('tamil');
   const [isLiked, setIsLiked] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -254,13 +255,25 @@ export const Visualizer: React.FC = () => {
               {/* Platform badge overlay */}
               <div className="absolute bottom-3 left-3 flex items-center gap-2">
                 <span className={`text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                  currentTrack.platform === 'spotify'
+                  currentTrack.platform === 'gaana'
+                    ? 'bg-rose-600/30 text-rose-300 border border-rose-500/40'
+                    : currentTrack.platform === 'ytmusic'
+                    ? 'bg-red-600/30 text-red-300 border border-red-500/40'
+                    : currentTrack.platform === 'spotify'
                     ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                     : currentTrack.platform === 'apple'
                     ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                     : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                 }`}>
-                  {currentTrack.platform === 'spotify' ? 'Spotify' : currentTrack.platform === 'apple' ? 'Apple Music' : 'Aura Master'}
+                  {currentTrack.platform === 'gaana'
+                    ? 'Gaana App'
+                    : currentTrack.platform === 'ytmusic'
+                    ? 'YouTube Music'
+                    : currentTrack.platform === 'spotify'
+                    ? 'Spotify'
+                    : currentTrack.platform === 'apple'
+                    ? 'Apple Music'
+                    : 'Aura Master'}
                 </span>
               </div>
             </div>
@@ -271,8 +284,13 @@ export const Visualizer: React.FC = () => {
             <h3 className="text-xl font-bold text-white tracking-tight truncate">
               {currentTrack.title}
             </h3>
+            {currentTrack.tamilTitle && (
+              <p className="text-xs font-semibold text-cyan-300 truncate mt-0.5">
+                {currentTrack.tamilTitle}
+              </p>
+            )}
             <p className="text-sm text-slate-300 font-medium truncate mt-0.5">
-              {currentTrack.artist}
+              {currentTrack.tamilArtist || currentTrack.artist}
             </p>
             
             {/* Unboxed metadata with typographic separators */}
@@ -342,31 +360,88 @@ export const Visualizer: React.FC = () => {
 
           {/* Synchronized Lyrics Container */}
           <div className="glass-panel-subtle rounded-2xl p-4 md:p-5 border border-white/10">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                Live Synchronized Lyrics
+                Live Synchronized Lyrics · பாடல் வரிகள்
               </span>
-              <span className="text-[11px] font-mono text-cyan-400/80">
-                {currentTrack.lyrics?.length ? 'Synced with Lounge' : 'Instrumental'}
-              </span>
+
+              {/* Language Switcher */}
+              <div className="flex items-center gap-1 p-0.5 bg-black/50 rounded-xl border border-white/10 text-xs">
+                <button
+                  onClick={() => setLyricLang('tamil')}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer font-medium ${
+                    lyricLang === 'tamil'
+                      ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  தமிழ்
+                </button>
+                <button
+                  onClick={() => setLyricLang('english')}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer font-medium ${
+                    lyricLang === 'english'
+                      ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setLyricLang('both')}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer font-medium ${
+                    lyricLang === 'both'
+                      ? 'bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Both
+                </button>
+              </div>
             </div>
 
-            <div className="h-28 overflow-y-auto space-y-2 pr-2 scroll-smooth">
+            <div className="h-32 overflow-y-auto space-y-3 pr-2 scroll-smooth">
               {currentTrack.lyrics && currentTrack.lyrics.length > 0 ? (
                 currentTrack.lyrics.map((line, idx) => {
                   const isActive = idx === activeLyricIndex;
                   return (
-                    <p
+                    <div
                       key={idx}
-                      className={`text-sm md:text-base font-medium transition-all duration-300 ${
+                      className={`transition-all duration-300 pl-3 border-l-2 ${
                         isActive
-                          ? 'text-cyan-300 font-bold scale-[1.01] translate-x-1'
-                          : 'text-slate-500 hover:text-slate-400'
+                          ? 'border-cyan-400 scale-[1.01] translate-x-1 bg-cyan-950/20 py-1 rounded-r-xl'
+                          : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                     >
-                      {line.text}
-                    </p>
+                      {/* Tamil script */}
+                      {(lyricLang === 'tamil' || lyricLang === 'both') && line.textTamil && (
+                        <p className={`text-sm md:text-base font-semibold ${isActive ? 'text-cyan-300' : 'text-slate-200'}`}>
+                          {line.textTamil}
+                        </p>
+                      )}
+
+                      {/* Transliteration */}
+                      {lyricLang === 'tamil' && line.transliteration && (
+                        <p className="text-xs text-slate-400 italic mt-0.5">
+                          {line.transliteration}
+                        </p>
+                      )}
+
+                      {/* English lyric */}
+                      {(lyricLang === 'english' || lyricLang === 'both' || !line.textTamil) && (
+                        <p className={`text-xs md:text-sm ${isActive ? 'text-white font-medium' : 'text-slate-400'}`}>
+                          {line.text}
+                        </p>
+                      )}
+
+                      {/* Meaning tooltip/subtitle */}
+                      {lyricLang === 'both' && line.meaning && (
+                        <p className="text-[11px] text-cyan-400/80 mt-0.5">
+                          ✨ {line.meaning}
+                        </p>
+                      )}
+                    </div>
                   );
                 })
               ) : (

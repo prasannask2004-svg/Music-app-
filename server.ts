@@ -1,12 +1,26 @@
 import express from 'express';
 import { createServer } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { INITIAL_TRACKS } from './src/data/catalog.js';
+import { GoogleGenAI } from '@google/genai';
+import { INITIAL_TRACKS } from './src/data/catalog.ts';
 
 dotenv.config();
+
+let aiClient: GoogleGenAI | null = null;
+if (process.env.GEMINI_API_KEY) {
+  aiClient = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build'
+      }
+    }
+  });
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -425,9 +439,105 @@ app.get('/api/rooms/:roomId', (req, res) => {
   res.json({ room: snapshot });
 });
 
+// Gemini AI Music Assistant Endpoint
+app.post('/api/assistant/chat', async (req, res) => {
+  const { prompt, currentTrack } = req.body;
+  if (!prompt) {
+    return res.status(400).json({ error: 'Prompt is required' });
+  }
+
+  // If Gemini API client is initialized
+  if (aiClient) {
+    try {
+      const systemInstruction = `You are 'Aura AI' (இசை உதவியாளர்), the elite AI music assistant and Tamil lyricist/musicologist for AuraGlass Sync v2.1.
+You have deep knowledge of:
+1. Tamil Cinema Music & Poetry (கவிதை வரிகள்): Kannadasan, Vairamuthu, Vaali, Na. Muthukumar, Thamarai, Vignesh Shivan.
+2. Legendary composers: A.R. Rahman, Ilaiyaraaja, Anirudh Ravichander, Yuvan Shankar Raja, Harris Jayaraj, Sid Sriram, and global artists.
+3. Ragas, emotions (பாவம், உணர்ச்சி), lyrical interpretations, and poetic breakdowns in both pure Tamil (தமிழ்) and English (Tanglish).
+Current playing track context:
+- Title: ${currentTrack?.title || 'Unknown'} (${currentTrack?.tamilTitle || ''})
+- Artist: ${currentTrack?.artist || 'Unknown'} (${currentTrack?.tamilArtist || ''})
+- Genre: ${currentTrack?.genre || 'Unknown'}
+
+Your instructions:
+- Provide rich, thoughtful, beautifully formatted responses with markdown.
+- When explaining Tamil lyrics, always provide the Tamil line (தமிழ்), English transliteration, and the poetic emotional meaning.
+- When asked to recommend or queue tracks, prioritize catalog items:
+  - "Marakkuma Nenjam (Acoustic Reverie)" [id: tamil-track-1] (Soulful Tamil Melody)
+  - "Chennai Neon Rain (சென்னையின் மழை இரவு)" [id: tamil-track-2] (Cyber Electro Tamil)
+  - "Azhage En Azhage (அழகே என் அழகே)" [id: tamil-track-3] (Tamil Lo-Fi Instrumental)
+- Be polite, poetic, and musically inspiring.`;
+
+      const geminiResponse = await aiClient.models.generateContent({
+        model: 'gemini-3.8-flash',
+        contents: prompt,
+        config: {
+          systemInstruction,
+          temperature: 0.7
+        }
+      });
+
+      const replyText = geminiResponse.text || "Here is your music guidance.";
+      
+      let suggestedTrackId: string | undefined = undefined;
+      const lower = replyText.toLowerCase();
+      if (lower.includes('marakkuma') || replyText.includes('மறக்குமா')) suggestedTrackId = 'tamil-track-1';
+      else if (lower.includes('chennai') || replyText.includes('சென்னை')) suggestedTrackId = 'tamil-track-2';
+      else if (lower.includes('azhage') || replyText.includes('அழகே')) suggestedTrackId = 'tamil-track-3';
+
+      return res.json({ reply: replyText, suggestedTrackId });
+    } catch (err: any) {
+      console.error('Gemini assistant error, using fallback:', err);
+    }
+  }
+
+  // Graceful domain-rich musicological fallback
+  const lowerPrompt = prompt.toLowerCase();
+  let reply = '';
+  let suggestedTrackId: string | undefined = undefined;
+
+  if (lowerPrompt.includes('tamil') || lowerPrompt.includes('தமிழ்') || lowerPrompt.includes('marakkuma') || lowerPrompt.includes('மறக்குமா')) {
+    reply = `🎶 **மறக்குமா நெஞ்சம் — பாடல் வரிகள் விளக்கம் (Tamil Lyric Breakdown):**\n\n- **தமிழ்:** *"மறக்குமா நெஞ்சம்... காலங்கள் கடந்தாலும் உன் நினைவை?"*\n- **Transliteration:** *Marakkumaa nenjam... kaalangal kadandhaalum un ninaivai?*\n- **Meaning:** "Will this heart ever let go of your cherished memories, no matter how distant time moves forward?"\n\n✨ **இசை உணர்வு (Musical Emotion):**\nThis song embodies classical *Karunai* (compassion) and deep nostalgic love, composed with warm acoustic guitar harmonics and soulful violin passages reminiscent of A.R. Rahman's melodies.`;
+    suggestedTrackId = 'tamil-track-1';
+  } else if (lowerPrompt.includes('recommend') || lowerPrompt.includes('பரிந்துரை') || lowerPrompt.includes('song') || lowerPrompt.includes('vibe')) {
+    reply = `🎧 **இனிய தமிழ் பாடல்கள் பரிந்துரை (Recommended Tamil Vibes):**\n\n1. **Marakkuma Nenjam (மறக்குமா நெஞ்சம்)** — Soulful Acoustic Melody for peaceful study or evening reflection.\n2. **Chennai Neon Rain (சென்னையின் மழை இரவு)** — Energetic electro synth beat inspired by Anirudh's vibrant night drive vibes.\n3. **Azhage En Azhage (அழகே என் அழகே)** — Calm meditative bamboo flute instrumental.\n\nWould you like to play or queue one in your synchronized lounge?`;
+    suggestedTrackId = 'tamil-track-1';
+  } else if (lowerPrompt.includes('meaning') || lowerPrompt.includes('explain') || lowerPrompt.includes('lyrics') || lowerPrompt.includes('வரிகள்')) {
+    reply = `📖 **Current Song Lyrics Analysis / வரிகள் பகுப்பாய்வு:**\n\nCurrently listening to **${currentTrack?.title || 'this track'}** (${currentTrack?.tamilTitle || ''}).\n\nThe lyrics explore the interplay between modern soundscapes and deep human emotion — how music synchronizes hearts across distant digital spaces (*"இரு உயிர்கள் இணையும் சங்கமம்... என்றும் அழியாத கவிதை"*).`;
+  } else {
+    reply = `வணக்கம்! I am your **Aura AI Music Assistant (இசை உதவியாளர்)**.\n\nI can help you with:\n- 📜 **Tamil Lyrics Analysis & Meanings** (பாடல் வரிகள் விளக்கம் & கவிதை நயம்)\n- 🎵 **Tamil & Global Song Recommendations** (மெலடி & சின்த் பரிந்துரைகள்)\n- 🌐 **Language Translations** (தமிழ் & English lyric breakdowns)\n- 🎧 **Lounge DJ Suggestions** for your collaborative room.\n\nHow can I enhance your listening experience today?`;
+  }
+
+  return res.json({ reply, suggestedTrackId });
+});
+
+// Gaana Music Server Endpoint
+app.get('/api/gaana/trending', (_req, res) => {
+  const gaanaTracks = INITIAL_TRACKS.filter(t => t.platform === 'gaana' || ['tamil', 'hindi', 'telugu', 'malayalam'].includes(t.language || ''));
+  res.json({
+    platform: 'gaana',
+    title: 'Gaana Top Multilingual Charts 2026',
+    tracks: gaanaTracks
+  });
+});
+
+// YouTube Music Server Endpoint
+app.get('/api/ytmusic/trending', (_req, res) => {
+  const ytTracks = INITIAL_TRACKS.filter(t => t.platform === 'ytmusic' || t.videoUrl);
+  res.json({
+    platform: 'ytmusic',
+    title: 'YouTube Music Trending Global & Regional',
+    tracks: ytTracks
+  });
+});
+
 // Vite Middleware integration for dev / static build for production
 async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
+  const distPath = path.resolve(__dirname, 'dist');
+  const indexHtmlPath = path.resolve(distPath, 'index.html');
+  const isProduction = process.env.NODE_ENV === 'production' || fs.existsSync(indexHtmlPath);
+
+  if (!isProduction) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -435,14 +545,17 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.resolve(__dirname, 'dist')));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+    app.use(express.static(distPath));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api') || req.path.startsWith('/ws')) {
+        return next();
+      }
+      res.sendFile(indexHtmlPath);
     });
   }
 
   server.listen(PORT, '0.0.0.0', () => {
-    console.log(`AuraGlass Sync Server listening on port ${PORT}`);
+    console.log(`AuraGlass Sync Server listening on port ${PORT} (mode: ${isProduction ? 'production' : 'development'})`);
   });
 }
 

@@ -89,17 +89,29 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({ onToggleQueueDrawer }) => 
               {currentTrack.title}
             </h4>
             <p className="text-xs text-slate-400 truncate">
-              {currentTrack.artist}
+              {currentTrack.tamilTitle ? `${currentTrack.tamilTitle} · ` : ''}{currentTrack.tamilArtist || currentTrack.artist}
             </p>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`text-[10px] font-semibold uppercase px-1.5 py-0.2 rounded ${
-                currentTrack.platform === 'spotify'
+              <span className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded ${
+                currentTrack.platform === 'gaana'
+                  ? 'text-rose-400 bg-rose-500/10 border border-rose-500/20'
+                  : currentTrack.platform === 'ytmusic'
+                  ? 'text-red-400 bg-red-500/10 border border-red-500/20'
+                  : currentTrack.platform === 'spotify'
                   ? 'text-emerald-400 bg-emerald-500/10'
                   : currentTrack.platform === 'apple'
                   ? 'text-rose-400 bg-rose-500/10'
                   : 'text-cyan-400 bg-cyan-500/10'
               }`}>
-                {currentTrack.platform === 'spotify' ? 'Spotify' : currentTrack.platform === 'apple' ? 'Apple Music' : 'Aura Master'}
+                {currentTrack.platform === 'gaana'
+                  ? 'Gaana'
+                  : currentTrack.platform === 'ytmusic'
+                  ? 'YouTube Music'
+                  : currentTrack.platform === 'spotify'
+                  ? 'Spotify'
+                  : currentTrack.platform === 'apple'
+                  ? 'Apple Music'
+                  : 'Aura Master'}
               </span>
             </div>
           </div>
